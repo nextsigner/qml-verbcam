@@ -17,6 +17,10 @@ ApplicationWindow {
     flags: Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     onXChanged: apps.x=x
     onYChanged: apps.y=y
+    property int ppx: 0
+    property int ppy: 0
+    property int ppw: 100
+    property int pph: 100
     Settings{
         id: apps
         fileName: pws+'/qml-webcam.cfg'
@@ -144,9 +148,39 @@ ApplicationWindow {
             onDoubleClicked: {
                 if(app.visibility===ApplicationWindow.FullScreen){
                     app.visibility="Windowed"
+                    tW.restart()
                 }else{
+                    app.ppx=videoOutPut.x
+                    app.ppy=videoOutPut.y
+                    app.ppw=videoOutPut.width
+                    app.pph=videoOutPut.height
                     app.visibility="FullScreen"
+                    tFS.restart()
                 }
+            }
+        }
+        Timer{
+            id: tFS
+            running: false
+            repeat: false
+            interval: 500
+            onTriggered: {
+                videoOutPut.width=xApp.width
+                videoOutPut.height=xApp.height
+                videoOutPut.x=(xApp.width-videoOutPut.width)/2
+                videoOutPut.y=(xApp.height-videoOutPut.height)/2
+            }
+        }
+        Timer{
+            id: tW
+            running: false
+            repeat: false
+            interval: 500
+            onTriggered: {
+                videoOutPut.x=app.ppx
+                videoOutPut.y=app.ppy
+                videoOutPut.width=app.ppw
+                videoOutPut.height=app.pph
             }
         }
 
@@ -170,7 +204,7 @@ ApplicationWindow {
                 }
             }
             Repeater{
-                model: ['z-', 'z+', 's1', 's2', 's3','s4',  'r', 'q']
+                model: ['z-', 'z+', 's1', 's2', 's3','s4',  'r','c', 'q']
                 Rectangle{
                     width: 20
                     height: width
@@ -221,6 +255,10 @@ ApplicationWindow {
             videoOutPut.rotation-=90
         }
         if(action===7){
+            videoOutPut.x=(app.width-videoOutPut.width)/2
+            videoOutPut.y=(app.height-videoOutPut.height)/2
+        }
+        if(action===8){
             Qt.quit()
         }
     }
