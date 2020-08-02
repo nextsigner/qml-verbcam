@@ -8,19 +8,25 @@ ApplicationWindow {
     id: app
     visible: true
     visibility: "Windowed"
-    width: Screen.width-982
-    height: Screen.height-500-40
+    width: apps.aw
+    height: apps.ah
     color: 'black'
     x:apps.x
     y:apps.y
     title: 'Qml WebCam - by @nextsigner'
-    flags: Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
+    flags: Qt.Window | Qt.Tool | Qt.WindowStaysOnTopHint//Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     onXChanged: apps.x=x
     onYChanged: apps.y=y
+    onWidthChanged: apps.aw=width
+    onHeightChanged: apps.ah=height
     property int ppx: 0
     property int ppy: 0
     property int ppw: 100
     property int pph: 100
+
+    property int appw: 100
+    property int apph: 100
+
     Settings{
         id: apps
         fileName: pws+'/qml-webcam.cfg'
@@ -33,6 +39,10 @@ ApplicationWindow {
         property int py: 0
         property int w: xApp.width
         property int h: xApp.height
+        property int apx: 0
+        property int apy: 0
+        property int aw: app.width
+        property int ah: app.height
         property int rotation: -90
     }
     Item{
@@ -61,7 +71,7 @@ ApplicationWindow {
             rotation:apps.rotation
             //fillMode: VideoOutput.PreserveAspectCrop
             //fillMode: VideoOutput.PreserveAspectFit
-            focus : visible // to receive focus and capture key events when visible
+            //focus : visible // to receive focus and capture key events when visible
             onXChanged: apps.px=x
             onYChanged: apps.py=y
             onWidthChanged: apps.w=width
@@ -117,7 +127,13 @@ ApplicationWindow {
                 border.color: 'red'
             }
         }
+//        MouseArea{
+//            enabled: app.visibility===ApplicationWindow.FullScreen
+//            anchors.fill: parent
+//            onDoubleClicked: app.visibility=ApplicationWindow.Windowed
+//        }
         MouseArea{
+            //enabled: app.visibility!==ApplicationWindow.FullScreen
             anchors.fill: parent
             hoverEnabled: true
             drag.target: videoOutPut
@@ -146,15 +162,25 @@ ApplicationWindow {
                 }
             }
             onDoubleClicked: {
-                if(app.visibility===ApplicationWindow.FullScreen){
-                    app.visibility="Windowed"
+                let isFull=app.width===Screen.width-2
+
+                if(isFull){
+                    //app.visibility="Windowed"
+                    console.log('Poniendo fullscreen')
                     tW.restart()
                 }else{
+                    console.log('Sacando fullscreen')
                     app.ppx=videoOutPut.x
                     app.ppy=videoOutPut.y
                     app.ppw=videoOutPut.width
                     app.pph=videoOutPut.height
-                    app.visibility="FullScreen"
+                    app.appw=app.width
+                    app.apph=app.height
+                    app.width=Screen.width-2
+                    app.height=Screen.height-2
+                    app.x=1
+                    app.y=1
+                    //app.visibility="FullScreen"
                     tFS.restart()
                 }
             }
@@ -181,6 +207,12 @@ ApplicationWindow {
                 videoOutPut.y=app.ppy
                 videoOutPut.width=app.ppw
                 videoOutPut.height=app.pph
+                app.width=app.appw
+                app.height=app.apph
+                console.log('x:'+app.x)
+                console.log('y:'+app.y)
+                console.log('w:'+app.width)
+                console.log('h:'+app.height)
             }
         }
 
@@ -295,7 +327,12 @@ ApplicationWindow {
             videoOutPut.rotation=rotation
         }
         if(Qt.platform.os==='windows'){
-            videoOutPut.fillMode = VideoOutput.PreserveAspectCrop
+            //videoOutPut.fillMode = VideoOutput.PreserveAspectCrop
+            videoOutPut.fillMode = VideoOutput.PreserveAspectFit
         }
+        console.log('x:'+app.x)
+        console.log('y:'+app.y)
+        console.log('w:'+app.width)
+        console.log('h:'+app.height)
     }
 }
