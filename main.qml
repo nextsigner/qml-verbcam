@@ -41,8 +41,8 @@ ApplicationWindow {
         property int h: xApp.height
         property int apx: 0
         property int apy: 0
-        property int aw: app.width
-        property int ah: app.height
+        property int aw: 500
+        property int ah: 500
         property int rotation: -90
     }
     Item{
@@ -184,6 +184,7 @@ ApplicationWindow {
                     tFS.restart()
                 }
             }
+            onClicked:grid.opacity=grid.opacity===0.0?1.0:0.0
         }
         Timer{
             id: tFS
@@ -215,7 +216,16 @@ ApplicationWindow {
                 console.log('h:'+app.height)
             }
         }
-
+        Timer{
+            id: tSP
+            running: app.width===Screen.width-2&&(app.x!==1||app.y!==1)
+            repeat: true
+            interval: 500
+            onTriggered: {
+                app.x=1
+                app.y=1
+            }
+        }
 
         Grid{
             id: grid
@@ -334,5 +344,9 @@ ApplicationWindow {
         console.log('y:'+app.y)
         console.log('w:'+app.width)
         console.log('h:'+app.height)
+        if(app.x>=Screen.width)app.x=0
+        if(app.y>=Screen.height)app.y=0
+        if(app.width>=Screen.width)app.width=Screen.width
+        if(app.height>=Screen.height)app.height=Screen.height
     }
 }
